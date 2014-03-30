@@ -1,0 +1,159 @@
+.app-title{
+    margin-bottom: 100px;
+    font-size: 42px;
+    color: #FFBF00;
+    font-weight: bold;
+    text-align: center;
+}
+#titlebar{
+    text-align: center;
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+.title{
+    margin-top: 12px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    display: inline-block;
+}
+
+.footer{
+    min-height: 0;
+}
+
+#contacts-page .contacts li{
+    height: 85px;
+}
+
+.login-cover{
+    background-image: url("../img/photonetra_cover.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.text-main{
+    color: #FFBF00;
+}
+
+.panel-main>.panel-heading{
+    color: #ffffff;
+    background-color: #FFBF00;
+    border: none;
+}
+
+.delivery-button{
+    margin-top: 20px;
+}
+
+#menu{
+    background: url("../img/open.png") center center no-repeat;
+    display: block;
+    width: 50px;
+    height: 50px;
+    float: right;
+    color: #ffffff;
+    border: none;
+    padding: 0;
+}
+
+#back{
+    float: left;
+    margin-left: 10px;
+    width: 50px;
+}
+
+#page{
+    padding: 10px;
+    position: relative;
+    top: 50px;
+}
+
+button {
+    width: 100%;
+}
+
+.submit{
+     margin-top: 20px;
+}
+
+#add-contact{
+    margin-bottom: 30px;
+}
+
+#choose-contact-page .or{
+    text-align: center;
+}
+
+form h2{
+    margin-bottom: 25px;
+}
+
+.no-pointer-events{
+    pointer-events: none;
+}
+
+#wait-loader-backdrop{
+    height: 100%;
+    background-color: rgba(44, 62, 80, 0.8);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+#wait-loader-backdrop .spinner-new {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -16px;
+    margin-left: -16px;
+    background-image: url("../img/spinner.gif");
+}
+
+label.error{
+    color: #ee5f5b;
+    margin-top: 5px;
+}
+
+#shoot-show-page .shoot-date{
+    color: #FFBF00;
+}
+#shoot-show-page .panel-heading{
+    height: 38px;
+}
+
+#shoot-show-page .add-payment, #shoot-show-page .edit-note{
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+    padding: 0;
+    margin-right: -10px;
+    margin-top: -5px;
+}
+
+#login-form{
+    width: 100%;
+    padding: 20px;
+    position: absolute;
+    top: 65%;
+    right: 0;
+    left: 0;
+    background: rgba(0,0,0,0.5);
+}
+
+.new-user{
+    text-align: center;
+    margin-top: 20px;
+    color: #5bc0de;
+}
+
+/*button, input, select, textarea {*/
+    /*height: 45px;*/
+/*}*/

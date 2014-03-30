@@ -1,0 +1,549 @@
+<!--http://pellepim.bitbucket.org/jstz/-->
+<!DOCTYPE html>
+<html>
+<head title="Photonetra">
+<title>Photonetra</title>
+<meta name="description" content="" />
+<meta name="format-detection" content="telephone=no" />
+<!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+<!--<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />-->
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<link href="lib/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="lib/sidr/jquery.sidr.dark.css" rel="stylesheet">
+<link href="lib/font/css/fontello.css" rel="stylesheet">
+<link href="lib/pickadate/default.css" rel="stylesheet">
+<link href="lib/pickadate/default.date.css" rel="stylesheet">
+<link href="lib/pickadate/default.time.css" rel="stylesheet">
+<link href="lib/calendar/calendar.css" rel="stylesheet">
+<link href="lib/calendar/custom.css" rel="stylesheet">
+<link href="app/app.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation" id="titlebar">
+    <span class="title">Shoots</span>
+    <a href="#" id="back" class="btn btn-default navbar-btn"><span class="icon-left"></span></a>
+    <a id="menu" href="#menu-list"></a>
+    <!--<div class="input-group">-->
+      <!--<span class="input-group-btn">-->
+        <!--<button class="btn btn-default btn-lg" type="button"><span class="icon-left"></span></button>-->
+      <!--</span>-->
+      <!--<input type="text" class="form-control input-lg" placeholder="Search">-->
+    <!--</div>-->
+</nav>
+
+
+<div id="page">
+</div>
+
+<div id="menu-list" style="display: none;">
+    <ul>
+        <li><a href="#shoots/upcoming">Shoots</a></li>
+        <li><a href="#contacts">Contacts</a></li>
+        <li><a href="#deliveries">Deliveries</a></li>
+        <li><a href="#payments">Payments</a></li>
+        <li><a href="#logout">Logout</a></li>
+    </ul>
+</div>
+
+<script id="login-view"  type="text/mustache">
+<div class="app-title">mobistudio</div>
+<form role="form" id="login-form">
+    <div class="form-group">
+        <input type="email" class="form-control input-lg" id="email" name="email" placeholder="Enter email">
+    </div>
+    <div class="form-group">
+        <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Password">
+    </div>
+    <button type="submit" class="btn btn-success btn-lg login">Login</button>
+</form>
+
+</script>
+
+
+<script id="shoots-view"  type="text/mustache">
+    <ul class="list-group shoots">
+        {{#shoots}}
+        <li class="list-group-item" data-href="#shoots/{{id}}/show">
+            <p class="text-left">
+            <h3 class="text-main">{{shoot_date}}</h3>
+            <h5><span class="icon-clock"></span>{{shoot_time_from}} to {{shoot_time_to}}</h5>
+            <span class="client-name text-info">{{event_name}} <br/></span>
+            <small class="text-muted shoot-type"><span class="icon-glass"></span>{{shoot_type}}</small>
+            </p>
+        </li>
+        {{/shoots}}
+    </ul>
+</script>
+
+<script id="delivery-view"  type="text/mustache">
+    <ul class="list-group shoots">
+        {{#shoots}}
+        <li class="list-group-item" data-href="#shoots/{{id}}/pending_delivery">
+            <p class="text-left">
+            <h3 class="text-danger"><span class="icon-bell-alt"></span> {{delivery_date}}</h3>
+            <h5>{{event_name}}</h5>
+            <span class="text-info"><span class="icon-camera"></span> {{shoot_date}} <br/></span>
+            <small class="text-muted"><span class="icon-glass"></span>{{shoot_type}}</small>
+            </p>
+        </li>
+        {{/shoots}}
+    </ul>
+</script>
+
+<script id="payments-view"  type="text/mustache">
+    <ul class="list-group shoots">
+        {{#shoots}}
+        <li class="list-group-item" data-href="#shoots/{{id}}/payment">
+            <p class="text-left">
+            <h3 class="text-success"><span class="icon-dollar"></span> {{amount_due}}</h3>
+            <h5>{{event_name}}</h5>
+            <span class="text-info"><span class="icon-camera"></span> {{shoot_date}} <br/></span>
+            <small class="text-muted"><span class="icon-glass"></span>{{shoot_type}}</small>
+            </p>
+        </li>
+        {{/shoots}}
+    </ul>
+</script>
+<script id="shoots-footer"  type="text/mustache">
+    <nav class="navbar navbar-fixed-bottom footer" role="navigation">
+        <div class="navbar-header text-center bottom-nav">
+            <div class="btn-group btn-group-justified">
+                <a href="#shoots/new" class="btn btn-default"><span class="icon-plus"></span></a>
+                <a href="#" class="btn btn-default filter-shoots"><span class="icon-filter"></span></a>
+            </div>
+        </div>
+    </nav>
+</script>
+<script id="contacts-footer"  type="text/mustache">
+    <nav class="navbar navbar-fixed-bottom footer" role="navigation">
+        <div class="navbar-header text-center bottom-nav">
+            <div class="btn-group btn-group-justified">
+                <a href="#contacts/new" class="btn btn-default"><span class="icon-plus"></span></a>
+            </div>
+        </div>
+    </nav>
+</script>
+
+<script id="contacts-view"  type="text/mustache">
+    <ul class="list-group contacts">
+        {{#contacts}}
+        {{#shoot_id}}
+        <li class="list-group-item" data-href="#shoots/{{.}}/assign_contact/{{id}}">
+            <h5 class="text-main"><span class="icon-user"></span> {{name}}</h5>
+            <small><span class="icon-phone"></span> {{phone}}</small>
+        </li>
+        {{/shoot_id}}
+        {{^shoot_id}}
+        <li class="list-group-item" data-href="#contacts/{{id}}/show">
+            <h5 class="text-main"><span class="icon-user"></span> {{name}}</h5>
+            <small><span class="icon-phone"></span> {{phone}}</small>
+        </li>
+        {{/shoot_id}}
+        {{/contacts}}
+    </ul>
+</script>
+
+<script id="select-contact-view"  type="text/mustache">
+    <div class="form-group">
+        <button type="submit" id="choose-existing" data-href="#shoots/{{shoot_id}}/choose_contact_from_list" class="btn btn-info input-lg"><span class="icon-user"></span> Choose Existing</button>
+    </div>
+    <div class="form-group">
+        <h3 class="or">Or</h3>
+    </div>
+    <h2 class="text-main"><span class="icon-user"></span> New Contact</h2>
+    <div class="form-area">
+    </div>
+    <button type="submit" id="create-contact-to-shoot" class="btn btn-success submit input-lg"><span class="icon-plus"></span> Add</button>
+</script>
+
+<script id="shoot-form-view"  type="text/mustache">
+    <form role="form" id="new-shoot-form">
+        <div class="form-group">
+            <label class="control-label" for="event-name">Event Name</label>
+            <input type="text" class="form-control input-lg" name="event_name" id="event-name" can-value="event_name" placeholder="Enter event name">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="shoot-type">Shoot Type</label>
+            <select class="form-control input-lg" name="shoot_type" id="shoot-type" can-value="shoot_type">
+                <option value="wedding">Wedding</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="shoot-date">Shoot Date</label>
+            <input type="text" class="form-control input-lg" name="shoot_date" id="shoot-date" can-value="shoot_date" placeholder="Enter Shoot Date">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="shoot-time-from">Shoot Time (from)</label>
+            <input type="text" class="form-control input-lg" name="shoot_time_from" id="shoot-time-from" can-value="shoot_time_from" placeholder="Enter Shoot Time (from)">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="shoot-time-to">Shoot Time (to)</label>
+            <input type="text" class="form-control input-lg" name="shoot_time_to" id="shoot-time-to" can-value="shoot_time_to" placeholder="Enter Shoot Time (to)">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="location">Location</label>
+            <textarea class="form-control input-lg" id="location" name="location" can-value="location" placeholder="Enter location"></textarea>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="delivery-date">Delivery Date</label>
+            <input type="text" class="form-control input-lg" name="delivery_date" id="delivery-date" can-value="delivery_date" placeholder="Enter Delivery date">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="charges">Charges</label>
+            <input type="number" class="form-control input-lg" name="charges" id="charges" can-value="charges" placeholder="Enter Charges">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="notes">Notes (optional)</label>
+            <textarea class="form-control input-lg" id="notes" name="notes" can-value="notes" placeholder="Enter Notes (optional)"></textarea>
+        </div>
+    </form>
+</script>
+
+<script id="contact-form-view"  type="text/mustache">
+    <form role="form" id="new-contact-form">
+        <div class="form-group">
+            <label class="control-label" for="name">Name</label>
+            <input type="text" class="form-control input-lg" name="name" id="name" can-value="name" placeholder="Enter Name">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="contact-no">Contact No</label>
+            <input type="text" class="form-control input-lg" name="phone" id="contact-no" can-value="phone" placeholder="Enter Contact No">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="email">Email address</label>
+            <input type="email" class="form-control input-lg" name="email" id="email" can-value="email" placeholder="Enter email">
+        </div>
+    </form>
+</script>
+
+<script id="contact-view"  type="text/mustache">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span class='icon-phone'></span> Phone No</h3>
+        </div>
+        <div class="panel-body">
+            <a href="tel:{{phone}}"><h4>{{phone}}</h4></a>
+        </div>
+    </div>
+
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span class='icon-mail'></span> Email</h3>
+        </div>
+        <div class="panel-body">
+            <h4>{{email}}</h4>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="icon-camera"></span>Shoots
+            </h3>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Event Name</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#shoots}}
+                <tr>
+                    <td>{{shoot_date}}</td>
+                    <td>{{event_name}}</td>
+                    <td><a href="#shoots/{{id}}/show" class="btn btn-default"><span class='icon-pencil'></span></a></td>
+                </tr>
+                {{/shoots}}
+                {{^shoots}}
+                <tr>
+                    <td colspan="3" class="text-center"><em>No Shoots</em></td>
+                </tr>
+                {{/shoots}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</script>
+
+
+
+<script id="contact-footer"  type="text/mustache">
+    <nav class="navbar navbar-fixed-bottom footer" role="navigation">
+        <div class="navbar-header text-center bottom-nav">
+            <div class="btn-group btn-group-justified">
+                <a href="#contacts/{{id}}/edit" class="btn btn-default"><span class='icon-pencil'></span> Edit</a>
+            </div>
+        </div>
+    </nav>
+</script>
+
+<script id="shoot-view"  type="text/mustache">
+    <div class="jumbotron">
+      <h1 class="shoot-date">{{shoot.shoot_date}}</h1>
+      <h5 class="text-muted"><span class="icon-clock"></span> {{shoot.shoot_time_from}} to {{shoot.shoot_time_to}}</h5>
+      <p>{{shoot.event_name}}</p>
+      <p><span class="icon-location text"></span> {{shoot.location}}</p>
+      {{#show_delivery}}
+          <p class="text-center"><button class="btn btn-danger btn-lg delivery-button" role="button"><span class="icon-ok"></span> Mark Delivery</button></p>
+      {{/show_delivery}}
+    </div>
+    {{#contact}}
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span class="icon-user"></span>Contact Details</h3>
+        </div>
+        <div class="panel-body">
+            <h4>{{name}}</h4>
+            <h5><span class="icon-mail"></span> {{email}}</h5>
+            <a href="tel:{{phone}}"><h4><span class="icon-phone"></span> {{phone}}</h4></a>
+        </div>
+    </div>
+    {{/contact}}
+    {{^contact}}
+    <button id="add-contact" data-href="#shoots/{{shoot.id}}/choose_contact" class='btn btn-info btn-lg'><span class="icon-user"></span>  Add a Contact</button>
+    {{/contact}}
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span class="icon-calendar"></span>Delivery Date</h3>
+        </div>
+        <div class="panel-body">
+            <p>{{shoot.delivery_date}}</p>
+        </div>
+    </div>
+
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span class="icon-money"></span>Charges</h3>
+        </div>
+        <div class="panel-body">
+            <p>{{shoot.charges}}</p>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title pull-left"><span class="icon-doc-text"></span>Notes</h3>
+            <button class="btn btn-primary pull-right edit-note"><span class="icon-pencil"></span></button>
+        </div>
+        <div class="panel-body">
+            <p>{{shoot.notes}}</p>
+        </div>
+    </div>
+
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title pull-left">
+            <span class="icon-dollar"></span>Payments
+            </h3>
+            <button class="btn btn-success pull-right add-payment" data-href="#shoots/{{shoot.id}}/payments/new"><span class="icon-plus"></span></button>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Comment</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#shoot.payments}}
+                    <tr>
+                        <td>{{payment_date}}</td>
+                        <td>{{amount}}</td>
+                        <td>{{comment}}</td>
+                    </tr>
+                {{/shoot.payments}}
+                {{^shoot.payments}}
+                    <tr>
+                        <td colspan="3" class="text-center"><em>No Payments made</em></td>
+                    </tr>
+                {{/shoot.payments}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</script>
+
+
+<script id="shoot-footer"  type="text/mustache">
+<!--<nav class="navbar navbar-fixed-bottom footer" role="navigation">-->
+    <!--<div class="navbar-header text-center bottom-nav">-->
+        <!--<div class="btn-group btn-group-justified">-->
+            <!--<a href="#shoots/{{id}}/edit" class="btn btn-default"><span class="icon-pencil"></span> Edit</a>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</nav>-->
+</script>
+
+<script id="signup-view"  type="text/mustache">
+    <form role="form" id="signup-form">
+        <div class="form-group">
+            <label class="control-label" for="name">Name</label>
+            <input type="text" class="form-control input-lg" id="name" name="name" placeholder="Enter your Name">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="studio_name">Studio Name</label>
+            <input type="text" class="form-control input-lg" id="studio_name" name="studio_name" placeholder="Enter Studio Name">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="email">Email address</label>
+            <input type="email" class="form-control input-lg" id="email" name="email" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="phone">Phone No</label>
+            <input type="text" class="form-control input-lg" id="phone" name="phone" placeholder="Enter Studio Name">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="website">Website</label>
+            <input type="text" class="form-control input-lg" id="website" name="website" placeholder="Enter Website address">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="password">Password</label>
+            <input type="password" class="form-control input-lg" id="password" name="password" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="confirm_password">Confirm Password</label>
+            <input type="password" class="form-control input-lg" id="confirm_password" name="confirm_password" placeholder="Confirm Password">
+        </div>
+        <button type="submit" class="btn btn-success submit btn-lg"><span class='icon-thumbs-up-alt'></span> Create Account</button>
+    </form>
+</script>
+
+<script id="payment-form-view"  type="text/mustache">
+    <div class="jumbotron">
+      <h1 class="shoot-date">{{shoot.shoot_date}}</h1>
+      <p>{{shoot.event_name}}</p>
+      <h5 class="text-muted"><span class="icon-glass"></span> {{shoot.shoot_type}}</h5>
+    </div>
+    <form role="form" id="new-payment-form">
+        <div class="form-group">
+            <h3 class="or">New Transaction</h3>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="payment-date">Payment Date</label>
+            <input type="text" class="form-control input-lg" name="payment_date" id="payment-date" can-value="payment.payment_date">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="amount">Amount</label>
+            <input type="number" class="form-control input-lg" name="amount" id="amount" can-value="payment.amount" placeholder="Enter Amount">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="comment">Comment</label>
+             <textarea class="form-control input-lg" id="comment" name="comment" can-value="payment.comment" placeholder="Enter Comment (optional)"></textarea>
+        </div>
+        <button type="submit" id="payment-submit" class="btn btn-success submit btn-lg"><span class='icon-dollar'></span> Create</button>
+    </form>
+</script>
+
+<script id="calendar-view"  type="text/mustache">
+    <div class="custom-calendar-wrap">
+        <div id="custom-inner" class="custom-inner">
+            <div class="custom-header clearfix">
+                <nav>
+                    <span id="custom-prev" class="custom-prev"></span>
+                    <span id="custom-next" class="custom-next"></span>
+                </nav>
+                <h2 id="custom-month" class="custom-month"></h2>
+                <h3 id="custom-year" class="custom-year"></h3>
+            </div>
+            <div id="calendar" class="fc-calendar-container"></div>
+        </div>
+    </div>
+</script>
+
+<div class="modal fade" id="message-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <span class="message"></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Ok</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="filter-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Filter Shoots</h4>
+            </div>
+            <div class="modal-body">
+                <div class="btn-group btn-group-justified">
+                    <a href="#!shoots/upcoming" class="btn btn-default filter-action">Upcoming</a>
+                    <a href="#!shoots/all" class="btn btn-default filter-action">All</a>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="delivery-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delivery Date</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control input-lg" id="delivery-date" name="delivery_date">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success update">Update</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<script src="lib/jquery/jquery.min.js"></script>
+<script src="lib/jquery/jquery.serializeJSON.js"></script>
+<script src="lib/crossdomain/crossdomain.js"></script>
+<script src="lib/bootstrap/bootstrap.min.js"></script>
+<script src="lib/jquery/jquery.validate.min.js"></script>
+<script src="lib/canjs/can.jquery.min.js"></script>
+<script src="lib/sidr/jquery.sidr.min.js"></script>
+<script src="lib/jquery.scrollnav.js"></script>
+<script src="lib/pickadate/picker.js"></script>
+<script src="lib/pickadate/picker.date.js"></script>
+<script src="lib/pickadate/picker.time.js"></script>
+<script src="lib/calendar/jquery.calendario.js"></script>
+<script src="lib/storejs/store.min.js"></script>
+<script src="app/models/can.model.local.js"></script>
+<script src="app/components/host.js"></script>
+<script src="app/components/authentication.js"></script>
+<script src="app/commons/loader.js"></script>
+<script src="app/commons/footer.js"></script>
+<script src="app/commons/validate.js"></script>
+<script src="app/commons/messageModal.js"></script>
+<script src="app/commons/datetimepicker.js"></script>
+<script src="app/models/photographer.js"></script>
+<script src="app/models/contact.js"></script>
+<script src="app/models/shoot.js"></script>
+<script src="app/models/pending_delivery.js"></script>
+<script src="app/models/payment.js"></script>
+<script src="app/authCtrl.js"></script>
+<script src="app/contactsCtrl.js"></script>
+<script src="app/shootsCtrl.js"></script>
+<script src="app/calendarCtrl.js"></script>
+<script src="app/deliveryCtrl.js"></script>
+<script src="app/paymentsCtrl.js"></script>
+<script src="app/routingCtrl.js"></script>
+<script src="app/app.js"></script>
+
+<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+<script type="text/javascript" charset="utf-8">
+    document.addEventListener("deviceready", onDeviceReady(), true);
+
+    function onDeviceReady() {
+        new Photonetra();
+        can.route.ready();
+    }
+</script>
+</body>
+</html>
